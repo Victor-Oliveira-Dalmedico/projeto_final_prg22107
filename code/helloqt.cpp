@@ -1,7 +1,7 @@
 #include "helloqt.h"
 
 HelloQT::HelloQT(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent), crono(Crono::criaCrono())
 {
     label = new QLabel("<h2>HelloQT</h2>");
 
@@ -32,12 +32,17 @@ HelloQT::HelloQT(QWidget *parent)
 HelloQT::~HelloQT() {}
 
 void HelloQT::toggleTimer() {
-    if (timer->isActive()) {
-        timer->stop();  // Para o timer
+    if (crono.getTime() > 0 && !timer->isActive()) {
+        crono.reset();  // Reseta o cronômetro antes de iniciar novamente
+        crono.start();  // Inicia o cronômetro
+        timer->start(10);  // Atualiza a interface a cada 10 ms
+        timerButton->setText("Stop Timer");
+    } else if (timer->isActive()) {
+        crono.stop();  // Para o cronômetro
+        timer->stop();  // Para o timer da interface
         timerButton->setText("Start Timer");
-        // Não reseta o label aqui, o tempo permanece visível
     } else {
-        elapsedTimer.start();  // Inicia a medição do tempo
+        crono.start();  // Inicia o cronômetro
         timer->start(10);  // Atualiza a interface a cada 10 ms
         timerButton->setText("Stop Timer");
     }
@@ -45,7 +50,7 @@ void HelloQT::toggleTimer() {
 
 void HelloQT::updateTimer() {
     // Obtém o tempo decorrido em milissegundos
-    qint64 elapsed = elapsedTimer.elapsed();
+    qint64 elapsed = crono.getTime();
 
     int minutes = (elapsed / 60000) % 60;  // 1 minuto = 60000 ms
     int seconds = (elapsed / 1000) % 60;   // 1 segundo = 1000 ms

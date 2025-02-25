@@ -3,7 +3,7 @@
 
 #include <QtWidgets>
 #include <QTimer>
-#include <QElapsedTimer>  // Inclua QElapsedTimer para medir o tempo
+#include "crono.h"  // Inclui a classe Crono
 
 class HelloQT : public QWidget
 {
@@ -25,7 +25,7 @@ private:
     QVBoxLayout *mainLayout;
 
     QTimer *timer;             // Timer para atualizar a interface
-    QElapsedTimer elapsedTimer; // Medidor de tempo decorrido
+    Crono& crono;              // Referência para o cronômetro
 };
 
 #endif // HELLOQT_H
