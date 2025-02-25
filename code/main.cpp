@@ -1,11 +1,11 @@
-#include "helloqt.h"
+#include "RRR.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    HelloQT window1;
+    RRR window1;
     window1.show();
 
     return a.exec();
