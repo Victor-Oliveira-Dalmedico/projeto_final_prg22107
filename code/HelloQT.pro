@@ -10,14 +10,18 @@ CONFIG += c++17
 
 SOURCES += \
     RRR.cpp \
+    casa.cpp \
     comparador.cpp \
     crono.cpp \
+    gerador.cpp \
     main.cpp
 
 HEADERS += \
     RRR.h \
+    casa.h \
     comparador.h \
-    crono.h
+    crono.h \
+    gerador.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
