@@ -1,0 +1,99 @@
+# Lista de Atributos e Métodos de Cada Classe
+
+A seguir, apresento uma lista detalhada dos atributos e métodos de cada classe do projeto "RRR", destacando a estrutura orientada a objetos implementada. As classes foram desenhadas com base nos princípios de encapsulamento, modularidade e responsabilidade única, utilizando C++ e o framework Qt.
+
+## Classe Crono
+Atributos:
+- QElapsedTimer elapsedTimer: Medidor de tempo decorrido para o cronômetro.
+- qint64 tempoa: Armazena o tempo acumulado em milissegundos.
+- bool running: Indica se o cronômetro está ativo.
+- Comparador& comparador: Referência ao objeto Comparador para chamar resetAcertos ao iniciar.
+- static Crono* instance: Ponteiro estático para a instância única (padrão Singleton).
+
+Métodos:
+- static Crono& criaCrono(Comparador& comparador): Método estático que cria ou retorna a instância única do Crono, recebendo uma referência ao Comparador.
+- void start(): Inicia o cronômetro e chama comparador.resetAcertos() para zerar os acertos.
+- void stop(): Para o cronômetro e acumula o tempo decorrido.
+- qint64 getTime() const: Retorna o tempo total decorrido em milissegundos.
+- void reset(): Reseta o cronômetro, zerando o tempo acumulado e o estado de execução.
+
+## Classe Comparador
+Atributos:
+- std::string casag: Armazena a casa alvo atual (no formato "linha,coluna").
+- int tempo: Armazena o tempo final do jogo em milissegundos.
+- int acertos: Contador de acertos do jogador.
+- float media: Média de tempo por acerto (em segundos por acerto).
+- float recorde: Melhor média registrada (menor tempo por acerto).
+- Crono& crono: Referência ao objeto Crono singleton para gerenciar o tempo.
+
+Métodos:
+- Comparador(): Construtor que inicializa os atributos e conecta ao Crono.
+- void Novacasa(const std::string& casa): Define a casa alvo atual.
+- void Compara(const std::string& tentativa): Compara a tentativa do jogador com a casa alvo, incrementando acertos ou chamando Para() em caso de erro.
+- void Para(): Para o cronômetro, armazena o tempo e chama CalculaMedia().
+- void CalculaMedia(): Calcula a média de tempo por acerto e atualiza o recorde se necessário.
+- int getAcertos() const: Retorna o número de acertos.
+- int getTempo() const: Retorna o tempo final do jogo.
+- float getMedia() const: Retorna a média de tempo por acerto.
+- float getRecorde() const: Retorna o recorde de média.
+- void resetAcertos(): Reseta o contador de acertos para 0.
+
+## Classe Casa
+Atributos:
+- int row: Linha do botão na grade.
+- int col: Coluna do botão na grade.
+
+Métodos:
+- Casa(int row, int col, QWidget *parent = nullptr): Construtor que inicializa as coordenadas e define o tamanho fixo do botão.
+- int getRow() const: Retorna a linha do botão.
+- int getCol() const: Retorna a coluna do botão.
+- void emitCoords(): Slot privado que emite o sinal clickedWithCoords com as coordenadas.
+
+Sinais:
+- void clickedWithCoords(int row, int col): Sinal emitido quando o botão é clicado, passando suas coordenadas.
+
+## Classe Gerador
+Atributos:
+- int gridSize: Tamanho da grade (n x n).
+- int targetRow: Linha da casa alvo gerada.
+- int targetCol: Coluna da casa alvo gerada.
+
+Métodos:
+- Gerador(int gridSize = 4): Construtor que inicializa o tamanho da grade e gera a primeira casa alvo.
+- void gerarNovaCasa(): Gera uma nova casa alvo aleatoriamente dentro da grade.
+- std::string getInstrucao() const: Retorna a instrução no formato "Clique no quadrado [letra][número]!".
+- std::string getCasaAlvo() const: Retorna a casa alvo no formato "linha,coluna" para o Comparador.
+- int getTargetRow() const: Retorna a linha da casa alvo.
+- int getTargetCol() const: Retorna a coluna da casa alvo.
+
+## Classe RRR
+Atributos:
+- QLabel *label: Label para exibir o título e o número de acertos.
+- QLabel *instructionLabel: Label para exibir instruções (ex.: "Clique no quadrado A1!").
+- QPushButton *timerButton: Botão para iniciar o timer.
+- QLabel *timerLabel: Label para exibir o tempo decorrido.
+- QGridLayout *gridLayout: Layout para a grade de botões.
+- QVBoxLayout *mainLayout: Layout principal da janela.
+- QHBoxLayout *gridWithLabelsLayout: Layout para combinar labels de linhas e a grade.
+- QVBoxLayout *gridAndBottomLayout: Layout para combinar a grade e labels de colunas.
+- QVBoxLayout *leftLayout: Layout para os labels de linhas.
+- QHBoxLayout *bottomLayout: Layout para os labels de colunas.
+- QTimer *timer: Timer para atualizar a interface (tempo decorrido).
+- Crono& crono: Referência ao cronômetro singleton.
+- Comparador comparador: Objeto para gerenciar acertos e estatísticas.
+- Gerador *gerador: Objeto para gerar casas alvo.
+- int gridSize: Tamanho da grade definido pelo usuário.
+- QVector<QVector<Casa*>> gridButtons: Matriz dinâmica de botões Casa.
+- QVector<QLabel*> rowLabels: Lista de labels para as linhas.
+- QVector<QLabel*> colLabels: Lista de labels para as colunas.
+
+Métodos:
+- RRR(QWidget *parent = nullptr): Construtor que inicializa a interface e os layouts.
+- ~RRR(): Destrutor que libera o gerador.
+- void toggleTimer(): Slot que inicia o timer e reseta o jogo.
+- void updateTimer(): Slot que atualiza a exibição do tempo na interface.
+- void handleSquareClick(int row, int col): Slot que processa cliques nos botões e gerencia o jogo.
+- void setupGameGrid(int size): Configura a grade de botões com o tamanho especificado.
+- void startNewRound(): Inicia uma nova rodada, gerando uma nova casa alvo.
+- void showSizeInputDialog(): Exibe o diálogo para o usuário inserir o tamanho da grade.
+- void setupCoordinateLabels(int size): Configura os labels de coordenadas (linhas e colunas).
