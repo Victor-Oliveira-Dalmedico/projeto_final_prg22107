@@ -1,20 +1,22 @@
 #include "crono.h"
+#include "comparador.h"
 
 Crono* Crono::instance = nullptr;
 
-Crono& Crono::criaCrono() {
+Crono& Crono::criaCrono(Comparador& comparador) {
     if (!instance) {
-        instance = new Crono();
+        instance = new Crono(comparador);
     }
     return *instance;
 }
 
-Crono::Crono() : tempoa(0), running(false) {}
+Crono::Crono(Comparador& comparador) : tempoa(0), running(false), comparador(comparador) {}
 
 void Crono::start() {
     if (!running) {
         elapsedTimer.start();
         running = true;
+        comparador.resetAcertos();  // Reseta os acertos ao iniciar o cronômetro
     }
 }
 

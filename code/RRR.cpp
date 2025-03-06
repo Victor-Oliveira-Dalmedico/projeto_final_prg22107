@@ -1,7 +1,11 @@
 #include "RRR.h"
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QPushButton>
 
 RRR::RRR(QWidget *parent)
-    : QWidget(parent), crono(Crono::criaCrono()), gerador(nullptr), gridSize(0)
+    : QWidget(parent), crono(Crono::criaCrono(comparador)), gerador(nullptr), gridSize(0)
 {
     label = new QLabel("<h2>RRR</h2>");
     instructionLabel = new QLabel("Aguardando tamanho da grade...");
@@ -47,8 +51,8 @@ RRR::~RRR() {
 void RRR::showSizeInputDialog() {
     bool ok;
     int size = QInputDialog::getInt(this, "Tamanho da Grade",
-                                    "Digite o tamanho da grade (ex.: 4 para 4x4):",
-                                    4, 2, 10, 1, &ok);
+                                    "Digite o tamanho da grade (ex.: 8 para 8x8):",
+                                    8, 2, 10, 1, &ok);
     if (ok) {
         gridSize = size;
         gerador = new Gerador(gridSize);
@@ -75,22 +79,19 @@ void RRR::setupGameGrid(int size) {
 }
 
 void RRR::setupCoordinateLabels(int size) {
-    // Limpa labels anteriores, se existirem
     for (QLabel* label : rowLabels) delete label;
     for (QLabel* label : colLabels) delete label;
     rowLabels.clear();
     colLabels.clear();
 
-    // Labels para linhas (lateral esquerda), invertidos (1 na parte inferior)
     for (int i = 0; i < size; i++) {
-        QLabel *rowLabel = new QLabel(QString::number(size - i));  // Inverte os números (ex.: 4, 3, 2, 1)
+        QLabel *rowLabel = new QLabel(QString::number(size - i));
         rowLabel->setAlignment(Qt::AlignCenter);
         rowLabel->setFixedSize(30, 50);
         rowLabels.append(rowLabel);
         leftLayout->addWidget(rowLabel);
     }
 
-    // Labels para colunas (parte inferior)
     QLabel *emptyLabel = new QLabel("");
     emptyLabel->setFixedSize(30, 30);
     bottomLayout->addWidget(emptyLabel);
@@ -106,11 +107,10 @@ void RRR::setupCoordinateLabels(int size) {
 
 void RRR::startNewRound() {
     gerador->gerarNovaCasa();
-    // Ajusta a instrução para o formato do xadrez (linha 1 na parte inferior)
-    int displayRow = gridSize - gerador->getTargetRow();  // Inverte a linha para exibição
+    int displayRow = gridSize - gerador->getTargetRow();
     char colLetter = 'A' + gerador->getTargetCol();
     instructionLabel->setText(QString("Clique no quadrado %1%2!").arg(colLetter).arg(displayRow));
-    comparador.Novacasa(gerador->getCasaAlvo());  // Mantém o formato interno inalterado
+    comparador.Novacasa(gerador->getCasaAlvo());
 }
 
 void RRR::handleSquareClick(int row, int col) {
@@ -124,9 +124,32 @@ void RRR::handleSquareClick(int row, int col) {
         label->setText(QString("<h2>RRR - Acertos: %1</h2>").arg(comparador.getAcertos()));
         startNewRound();
     } else {
-        instructionLabel->setText("Errado! Jogo terminado.");
+        instructionLabel->setText("Errado! Resultados em nova janela...");
         timer->stop();
-        timerButton->setEnabled(false);
+        timerButton->setEnabled(true);
+        timerButton->setText("Start Timer");
+
+        // Criar uma nova janela de diálogo para resultados
+        QDialog *resultDialog = new QDialog(this);
+        resultDialog->setWindowTitle("Resultados");
+        QVBoxLayout *dialogLayout = new QVBoxLayout(resultDialog);
+
+        QLabel *acertosLabel = new QLabel(QString("Número de Acertos: %1").arg(comparador.getAcertos()));
+        QLabel *tempoLabel = new QLabel(QString("Tempo Decorrido: %1 s").arg((comparador.getTempo()/1000)));
+        QLabel *mediaLabel = new QLabel(QString("Média: %1 s/acerto").arg(comparador.getMedia(), 0, 'f', 2));
+        QLabel *recordeLabel = new QLabel(QString("Recorde: %1 s/acerto").arg(comparador.getRecorde(), 0, 'f', 2));
+
+        QPushButton *closeButton = new QPushButton("Fechar");
+        QObject::connect(closeButton, &QPushButton::clicked, resultDialog, &QDialog::accept);
+
+        dialogLayout->addWidget(acertosLabel);
+        dialogLayout->addWidget(tempoLabel);
+        dialogLayout->addWidget(mediaLabel);
+        dialogLayout->addWidget(recordeLabel);
+        dialogLayout->addWidget(closeButton);
+
+        resultDialog->setLayout(dialogLayout);
+        resultDialog->exec();  // Exibe a janela modal
     }
 }
 
@@ -136,15 +159,17 @@ void RRR::toggleTimer() {
         crono.start();
         timer->start(10);
         timerButton->setText("Stop Timer");
+        timerButton->setEnabled(false);
+        label->setText(QString("<h2>RRR - Acertos: %1</h2>").arg(comparador.getAcertos()));
         startNewRound();
-        timerButton->setEnabled(true);
     } else if (timer->isActive()) {
-        timer->stop();
-        timerButton->setText("Start Timer");
+        // Não permite parar manualmente
     } else {
         crono.start();
         timer->start(10);
         timerButton->setText("Stop Timer");
+        timerButton->setEnabled(false);
+        label->setText(QString("<h2>RRR - Acertos: %1</h2>").arg(comparador.getAcertos()));
     }
 }
 

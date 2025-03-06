@@ -3,22 +3,24 @@
 
 #include <QElapsedTimer>
 
+class Comparador;  // Declaração forward para evitar dependência circular
+
 class Crono {
 public:
-    static Crono& criaCrono();  // Método estático para criar/obter a instância única
-
-    void start();               // Inicia o cronômetro
-    void stop();                // Para o cronômetro
-    qint64 getTime() const;     // Retorna o tempo atual em milissegundos
-    void reset();               // Reseta o cronômetro
+    static Crono& criaCrono(Comparador& comparador);  // Método estático ajustado para receber Comparador
+    void start();
+    void stop();
+    qint64 getTime() const;
+    void reset();
 
 private:
-    Crono();  // Construtor privado para garantir que a classe seja um singleton
-    QElapsedTimer elapsedTimer; // Medidor de tempo decorrido
-    qint64 tempoa;              // Tempo atual em milissegundos
-    bool running;               // Indica se o cronômetro está em execução
+    Crono(Comparador& comparador);  // Construtor privado ajustado
+    QElapsedTimer elapsedTimer;
+    qint64 tempoa;
+    bool running;
+    Comparador& comparador;  // Referência ao Comparador para chamar resetAcertos
 
-    static Crono* instance;     // Ponteiro para a instância única
+    static Crono* instance;
 };
 
 #endif // CRONO_H

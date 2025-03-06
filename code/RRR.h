@@ -32,6 +32,8 @@ private:
     QLabel *instructionLabel;
     QPushButton *timerButton;
     QLabel *timerLabel;
+    QLabel *mediaLabel;  // Nova label para média
+    QLabel *recordeLabel;  // Nova label para recorde
     QGridLayout *gridLayout;
     QVBoxLayout *mainLayout;
     QHBoxLayout *gridWithLabelsLayout;
