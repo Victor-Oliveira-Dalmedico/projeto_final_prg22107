@@ -8,7 +8,7 @@ RRR::RRR(QWidget *parent)
     instructionLabel->setAlignment(Qt::AlignCenter);
 
     timerButton = new QPushButton("Start Timer");
-    timerButton->setEnabled(false);  // Desativado até a grade ser criada
+    timerButton->setEnabled(false);
     QObject::connect(timerButton, &QPushButton::clicked, this, &RRR::toggleTimer);
 
     timerLabel = new QLabel("00:00:000");
@@ -17,14 +17,23 @@ RRR::RRR(QWidget *parent)
     timer = new QTimer(this);
     QObject::connect(timer, &QTimer::timeout, this, &RRR::updateTimer);
 
+    leftLayout = new QVBoxLayout();
+    bottomLayout = new QHBoxLayout();
     gridLayout = new QGridLayout();
+    gridWithLabelsLayout = new QHBoxLayout();
+    gridAndBottomLayout = new QVBoxLayout();
+
+    gridWithLabelsLayout->addLayout(leftLayout);
+    gridWithLabelsLayout->addLayout(gridLayout);
+    gridAndBottomLayout->addLayout(gridWithLabelsLayout);
+    gridAndBottomLayout->addLayout(bottomLayout);
 
     mainLayout = new QVBoxLayout();
     mainLayout->addWidget(label);
     mainLayout->addWidget(instructionLabel);
     mainLayout->addWidget(timerButton);
     mainLayout->addWidget(timerLabel);
-    mainLayout->addLayout(gridLayout);
+    mainLayout->addLayout(gridAndBottomLayout);
 
     setLayout(mainLayout);
 
@@ -44,6 +53,7 @@ void RRR::showSizeInputDialog() {
         gridSize = size;
         gerador = new Gerador(gridSize);
         setupGameGrid(gridSize);
+        setupCoordinateLabels(gridSize);
         instructionLabel->setText(QString::fromStdString(gerador->getInstrucao()));
         timerButton->setEnabled(true);
         startNewRound();
@@ -64,10 +74,43 @@ void RRR::setupGameGrid(int size) {
     }
 }
 
+void RRR::setupCoordinateLabels(int size) {
+    // Limpa labels anteriores, se existirem
+    for (QLabel* label : rowLabels) delete label;
+    for (QLabel* label : colLabels) delete label;
+    rowLabels.clear();
+    colLabels.clear();
+
+    // Labels para linhas (lateral esquerda), invertidos (1 na parte inferior)
+    for (int i = 0; i < size; i++) {
+        QLabel *rowLabel = new QLabel(QString::number(size - i));  // Inverte os números (ex.: 4, 3, 2, 1)
+        rowLabel->setAlignment(Qt::AlignCenter);
+        rowLabel->setFixedSize(30, 50);
+        rowLabels.append(rowLabel);
+        leftLayout->addWidget(rowLabel);
+    }
+
+    // Labels para colunas (parte inferior)
+    QLabel *emptyLabel = new QLabel("");
+    emptyLabel->setFixedSize(30, 30);
+    bottomLayout->addWidget(emptyLabel);
+
+    for (int j = 0; j < size; j++) {
+        QLabel *colLabel = new QLabel(QChar('A' + j));
+        colLabel->setAlignment(Qt::AlignCenter);
+        colLabel->setFixedSize(50, 30);
+        colLabels.append(colLabel);
+        bottomLayout->addWidget(colLabel);
+    }
+}
+
 void RRR::startNewRound() {
     gerador->gerarNovaCasa();
-    instructionLabel->setText(QString::fromStdString(gerador->getInstrucao()));
-    comparador.Novacasa(gerador->getCasaAlvo());
+    // Ajusta a instrução para o formato do xadrez (linha 1 na parte inferior)
+    int displayRow = gridSize - gerador->getTargetRow();  // Inverte a linha para exibição
+    char colLetter = 'A' + gerador->getTargetCol();
+    instructionLabel->setText(QString("Clique no quadrado %1%2!").arg(colLetter).arg(displayRow));
+    comparador.Novacasa(gerador->getCasaAlvo());  // Mantém o formato interno inalterado
 }
 
 void RRR::handleSquareClick(int row, int col) {
@@ -82,8 +125,8 @@ void RRR::handleSquareClick(int row, int col) {
         startNewRound();
     } else {
         instructionLabel->setText("Errado! Jogo terminado.");
-        timer->stop();  // Para o timer da interface
-        timerButton->setEnabled(false);  // Desativa o botão até reiniciar
+        timer->stop();
+        timerButton->setEnabled(false);
     }
 }
 
@@ -93,10 +136,10 @@ void RRR::toggleTimer() {
         crono.start();
         timer->start(10);
         timerButton->setText("Stop Timer");
-        startNewRound();  // Reinicia o jogo ao reiniciar o timer
+        startNewRound();
         timerButton->setEnabled(true);
     } else if (timer->isActive()) {
-        timer->stop();  // Apenas para o timer da interface
+        timer->stop();
         timerButton->setText("Start Timer");
     } else {
         crono.start();

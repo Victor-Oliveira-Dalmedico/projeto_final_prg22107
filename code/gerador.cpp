@@ -11,10 +11,11 @@ void Gerador::gerarNovaCasa() {
 }
 
 std::string Gerador::getInstrucao() const {
-    return "Clique no quadrado (" + std::to_string(targetRow + 1) + ", " +
-           std::to_string(targetCol + 1) + ")!";
+    char colLetter = 'A' + targetCol;  // Converte a coluna para letra (A, B, C, ...)
+    return "Clique no quadrado " + std::string(1, colLetter) + std::to_string(targetRow + 1) + "!";
 }
 
 std::string Gerador::getCasaAlvo() const {
-    return std::to_string(targetRow) + "," + std::to_string(targetCol);
+    char colLetter = 'A' + targetCol;  // Converte a coluna para letra
+    return std::to_string(targetRow) + "," + std::to_string(targetCol);  // Mantém o formato interno como números
 }

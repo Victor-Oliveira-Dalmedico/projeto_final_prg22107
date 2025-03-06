@@ -18,14 +18,15 @@ public:
     ~RRR();
 
 public slots:
-    void toggleTimer();  // Slot para iniciar/parar o cronômetro
-    void updateTimer();  // Slot para atualizar o tempo decorrido
-    void handleSquareClick(int row, int col);  // Slot para cliques nos quadrados
+    void toggleTimer();
+    void updateTimer();
+    void handleSquareClick(int row, int col);
 
 private:
-    void setupGameGrid(int size);  // Configura a grade com tamanho dinâmico
-    void startNewRound();          // Inicia uma nova rodada
-    void showSizeInputDialog();    // Exibe diálogo para entrada do tamanho
+    void setupGameGrid(int size);
+    void startNewRound();
+    void showSizeInputDialog();
+    void setupCoordinateLabels(int size);
 
     QLabel *label;
     QLabel *instructionLabel;
@@ -33,14 +34,20 @@ private:
     QLabel *timerLabel;
     QGridLayout *gridLayout;
     QVBoxLayout *mainLayout;
+    QHBoxLayout *gridWithLabelsLayout;
+    QVBoxLayout *gridAndBottomLayout;
+    QVBoxLayout *leftLayout;
+    QHBoxLayout *bottomLayout;
 
     QTimer *timer;
     Crono& crono;
     Comparador comparador;
-    Gerador *gerador;  // Ponteiro para permitir inicialização posterior
+    Gerador *gerador;
 
-    int gridSize;  // Tamanho da grade definido pelo usuário
-    QVector<QVector<Casa*>> gridButtons;  // Matriz dinâmica de botões
+    int gridSize;
+    QVector<QVector<Casa*>> gridButtons;
+    QVector<QLabel*> rowLabels;
+    QVector<QLabel*> colLabels;
 };
 
 #endif // RRR_H
