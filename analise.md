@@ -22,6 +22,7 @@ Apresentar o diagram de casos de uso, identificando as funcionalidades do sistem
 
 Elaborar um diagrama conceitual do domínio do problema.
 ![image](https://github.com/user-attachments/assets/f6b10589-36e0-4a54-bbf8-aad7d0eb8e70)
+A tipagem de algumas variáveis foi alterada ao longo da composição do código para melhor eficiência.
 
 
 <div align="center">
