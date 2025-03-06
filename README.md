@@ -2,7 +2,7 @@
      width="30%"
      style="padding: 10px">
 
-# << Título do projeto >>
+# << RRR: Reagir Rápido e Relembrar >>
 
 ## << Descrição breve do domínio do problema >>
 
